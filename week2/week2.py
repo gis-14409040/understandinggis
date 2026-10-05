@@ -4,7 +4,7 @@ from pyproj import Geod
 # load the shapefile of countries - this gives a table of 12 columns and 246 rows (one per country)
 world = read_file("../../data/natural-earth/ne_10m_admin_0_countries.shp")
 # print a list of all of the columns in the shapefile
-
+lambert_conic="+proj=moll +lon_0=0 +datum=WGS84 +units=m +no_defs"
 print(world.columns)
 
 
@@ -36,23 +36,6 @@ mex_geom = mex_col.iloc[0]
 print(type(mex_geom))
 # calculate the intersection of the geometry objects
 border = usa_geom.intersection(mex_geom)
-
-# create map axis object
-my_fig, my_ax = subplots(1, 1, figsize=(16, 10))
-
-# remove axes
-my_ax.axis('off')
-
-# plot the border
-GeoSeries(border).plot(
-  ax = my_ax
-	)
-
-# save the image
-savefig('./out/first-border.png')
-
-
-
 # set which ellipsoid you would like to use
 g = Geod(ellps='WGS84')
 
@@ -75,3 +58,61 @@ for segment in border.geoms:
 	cumulative_length += distance
    
 print(cumulative_length)
+
+graticule = read_file("../../data/natural-earth/ne_110m_graticules_5.shp")
+# create map axis object
+my_fig, my_ax = subplots(1, 1, figsize=(16, 10))
+
+# remove axes
+my_ax.axis('off')
+
+# set title
+title(f"The wall would have been {cumulative_length / 1000:.2f} km long.")
+
+# project border
+border_series = GeoSeries(border, crs=world.crs).to_crs(lambert_conic)
+
+# extract the bounds from the (projected) GeoSeries Object
+minx, miny, maxx, maxy = border_series.geometry.iloc[0].bounds
+
+# set bounds (10000m buffer around the border itself, to give us some context)
+buffer = 10000
+my_ax.set_xlim([minx - buffer, maxx + buffer])
+my_ax.set_ylim([miny - buffer, maxy + buffer])
+
+# plot data
+usa.to_crs(lambert_conic).plot(
+    ax = my_ax,
+    color = '#ccebc5',
+    edgecolor = '#4daf4a',
+    linewidth = 0.5,
+    )
+mex.to_crs(lambert_conic).plot(
+    ax = my_ax,
+    color = '#fed9a6',
+    edgecolor = '#ff7f00',
+    linewidth = 0.5,
+    )
+border_series.plot(     # note that this has already been projected above!
+    ax = my_ax,
+    color = '#984ea3',
+    linewidth = 2,
+    )
+graticule.to_crs(lambert_conic).plot(
+    ax=my_ax,
+    color='grey',
+    linewidth = 1,
+    )
+
+# save the result
+savefig('out/2.png', bbox_inches='tight')
+print("done!")
+border_series = GeoSeries(border, crs=world.crs).to_crs(lambert_conic)
+# extract the bounds from the (projected) GeoSeries Object
+minx, miny, maxx, maxy = border_series.geometry.iloc[0].bounds
+
+# set bounds (10000m buffer around the border itself, to give us some context)
+buffer = 10000
+my_ax.set_xlim([minx - buffer, maxx + buffer])
+my_ax.set_ylim([miny - buffer, maxy + buffer])
+
