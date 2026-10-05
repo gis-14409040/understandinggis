@@ -35,4 +35,19 @@ mex_geom = mex_col.iloc[0]
 print(type(mex_geom))
 # calculate the intersection of the geometry objects
 border = usa_geom.intersection(mex_geom)
+
+# create map axis object
+my_fig, my_ax = subplots(1, 1, figsize=(16, 10))
+
+# remove axes
+my_ax.axis('off')
+
+# plot the border
+GeoSeries(border).plot(
+  ax = my_ax
+	)
+
+# save the image
+savefig('./out/first-border.png')
+
 print(border)
