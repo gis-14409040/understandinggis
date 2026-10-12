@@ -10,3 +10,11 @@ def distance(x1, y1, x2, y2):
     """
     return sqrt((x1-x2)**2+(y1-y2)**2)# complete this line to return the distance between (x1,y1) and (x2,y2)
 print (distance(345678,456789,445678,556789))
+
+from geopandas import read_file
+# read in shapefiles, ensure that they all have the same CRS
+pop_points = read_file("../../../data/gulu/pop_points.shp")
+water_points = read_file("../../../data/gulu/water_points.shp")
+gulu_district = read_file("../../../data/gulu/district.shp")
+ 
+print(water_points.estimate_utm_crs(datum_name='Arc 1960'))
