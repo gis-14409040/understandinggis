@@ -18,3 +18,7 @@ water_points = read_file("../../../data/gulu/water_points.shp")
 gulu_district = read_file("../../../data/gulu/district.shp")
  
 print(water_points.estimate_utm_crs(datum_name='Arc 1960'))
+# read in the `water_points` dataset AND transform it the the same CRS as `pop_points`
+water_points = read_file("../../../data/gulu/water_points.shp").to_crs(pop_points.crs)
+print(f"population points: {len(pop_points)}")
+print(f"Initial wells: {len(water_points)}")
