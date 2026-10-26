@@ -1,5 +1,5 @@
 from math import radians,sin,cos# IMPORT NECESSARY FUNCTIONS HERE
-
+from pyproj import Geod
 def compute_offset(origin, distance, direction):
     """
     Compute the location of a point at a given distance and direction from a specified location using trigonometry
@@ -26,3 +26,13 @@ ice = land_cover[land_cover["fclass"] == "glacier"]
 minx, miny, maxx, maxy = iceland.total_bounds
 
 print(minx, miny, maxx, maxy)
+
+# set the geographical proj string and ellipsoid (should be the same)
+geo_string = "+proj=longlat +datum=WGS84 +no_defs"
+g = Geod(ellps='WGS84')
+# create a list of dictionaries for the projected CRS' to evaluate for distortion
+projections = [
+    {'name':"Web Mercator", 'description':"Global Conformal",   'proj':""},
+    {'name':"Eckert IV",    'description':"Global Equal Area",  'proj':""},
+    {'name':"", 'description':"Local Equal Area",   'proj':""}
+]
