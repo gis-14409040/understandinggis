@@ -1,5 +1,5 @@
 from math import radians,sin,cos# IMPORT NECESSARY FUNCTIONS HERE
-from pyproj import Geod
+from pyproj import Geod,CRS,Transformer
 def compute_offset(origin, distance, direction):
     """
     Compute the location of a point at a given distance and direction from a specified location using trigonometry
@@ -32,7 +32,19 @@ geo_string = "+proj=longlat +datum=WGS84 +no_defs"
 g = Geod(ellps='WGS84')
 # create a list of dictionaries for the projected CRS' to evaluate for distortion
 projections = [
-    {'name':"Web Mercator", 'description':"Global Conformal",   'proj':""},
-    {'name':"Eckert IV",    'description':"Global Equal Area",  'proj':""},
-    {'name':"", 'description':"Local Equal Area",   'proj':""}
+    {'name':"Web Mercator", 'description':"Global Conformal",   'proj':"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs"},
+    {'name':"Eckert IV",    'description':"Global Equal Area",  'proj':"+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"},
+    {'name':"", 'description':"Local Equal Area",   'proj':"+proj=aea +lon_0=-18.8964844 +lat_1=63.5404797 +lat_2=66.3620426 +lat_0=64.9512612 +datum=WGS84 +units=m +no_defs"}
 ]
+
+    # loop through each CRS
+for ax_num, projection in enumerate(projections):
+  
+    # initialise a PyProj Transformer to transform coordinates
+    transformer = Transformer.from_crs(
+        CRS.from_proj4(geo_string), 
+        CRS.from_proj4(projection['proj']),
+        always_xy=True
+    )
+    print(ax_num, projection)
+    print("geo_string =", repr(geo_string))
