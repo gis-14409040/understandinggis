@@ -6,6 +6,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from skimage.draw import line
 from skimage.draw import circle_perimeter
 from numpy import column_stack
+from sys import exit
 # open the elevation data file
 with rio_open("../../data/helvellyn/Helvellyn-50.tif") as dem:
 
@@ -45,3 +46,13 @@ output[row, col] = 1
 print(line(row, col, row, col+50))
 print(column_stack(line(row, col, row, col+50)))
 circle_perimeter(row, col, 50)
+# set origin for viewshed
+x0, y0 = 330000, 512500
+# calculate the viewshed
+output = viewshed(x0, y0, 20000, 1.8, 100, dem_data, dem.transform)
+# make sure that we are within the dataset
+	if not 0 <= r0 < dem_data.shape[0] or not 0 <= c0 < dem_data.shape[1]:
+		print(f"Sorry, {x0, y0} is not within the elevation dataset.")
+		exit()
+        # convert the radius (m) to pixels
+	radius_px = int(radius_m / transform[0])
