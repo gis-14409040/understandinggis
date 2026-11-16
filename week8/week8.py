@@ -41,3 +41,5 @@ row, col = coords_2_img(334170, 515165)
 
 # Set the pixel at this location to 1 (red)
 output[row, col] = 1
+print(line(row, col, row, col+50))
+print(column_stack(line(row, col, row, col+50)))
